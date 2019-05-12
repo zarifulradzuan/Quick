@@ -4,9 +4,9 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
-
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,32 +18,28 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
-
-import java.util.ArrayList;
-
-import com.example.quick.model.OpeningHours;
-import com.example.quick.model.Place;
-
-public class MapViewFragment extends Fragment implements LocationListener{
+public class MapViewFragment extends Fragment implements LocationListener {
 
     MapView mapView;
+    Fragment fragment;
     private GoogleMap googleMap;
     protected LocationManager locationManager;
     protected double lat,lng;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.activity_map_view_fragment, container, false);
-        mapView = (MapView) rootView.findViewById(R.id.mapView);
+        final View rootView = inflater.inflate(R.layout.activity_map_view_fragment, container, false);
+        mapView = rootView.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
         try{
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,0,this);
         }catch (SecurityException e){
             e.printStackTrace();
         }
+
         MapsInitializer.initialize(getActivity().getApplicationContext());
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -57,12 +53,38 @@ public class MapViewFragment extends Fragment implements LocationListener{
                 }catch(SecurityException e){
                     e.printStackTrace();
                 }
+                map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                    @Override
+                    public void onMapClick(LatLng latLng) {
+                        getActivity().findViewById(R.id.placeInfoFrame).setVisibility(View.GONE);
+                    }
+                });
+                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        String placeId = (String) marker.getTag();
+
+                        getActivity().findViewById(R.id.placeInfoFrame).setVisibility(View.VISIBLE);
+                        FragmentManager fragmentManager = getFragmentManager();
+                        Fragment fragment = new PlaceInfoFragment();
+                        Bundle args = new Bundle();
+                        args.putString("placeId", placeId);
+                        try {
+                            fragment = PlaceInfoFragment.class.newInstance();
+                            fragment.setArguments(args);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        fragmentManager.beginTransaction().replace(R.id.placeInfoFrame, fragment).commit();
+                        return false;
+                    }
+                });
                 PlaceController.getPlaces(map);
             }
         });
-
         return rootView;
     }
+
 
     @Override
     public void onResume() {
@@ -92,7 +114,6 @@ public class MapViewFragment extends Fragment implements LocationListener{
     public void onLocationChanged(Location location) {
         this.lat = location.getLatitude();
         this.lng = location.getLongitude();
-        System.out.println(lat+" "+lng);
     }
 
     @Override

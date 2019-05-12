@@ -1,11 +1,11 @@
 package com.example.quick.controller;
 
-import android.app.NotificationManager;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.quick.PlaceAdapter;
+import com.example.quick.PlaceInfoFragment;
 import com.example.quick.model.OpeningHours;
 import com.example.quick.model.Place;
 import com.google.android.gms.maps.GoogleMap;
@@ -13,25 +13,22 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.Query;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class PlaceController {
-    Place place;
-    FirebaseDatabase database;
-    DatabaseReference databaseReference;
+    private Place place;
+    private FirebaseDatabase database;
+    private DatabaseReference databaseReference;
     public PlaceController(Place place) {
         this.place = place;
         database = FirebaseDatabase.getInstance();
@@ -45,18 +42,28 @@ public class PlaceController {
         databaseReference.addChildEventListener(new ChildEventListener() {
 
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
-                Place place = dataSnapshot.getValue(Place.class);
-                places.put(place.getPlaceId(),place);
-                placeAdapter.setPlaces(places);
-                placeAdapter.notifyDataSetChanged();
+                Place place = null;
+                try {
+                    place = dataSnapshot.getValue(Place.class);
+                    places.put(place.getPlaceId(), place);
+                    placeAdapter.setPlaces(places);
+                    placeAdapter.notifyDataSetChanged();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Place place = dataSnapshot.getValue(Place.class);
-                places.put(place.getPlaceId(),place);
-                placeAdapter.setPlaces(places);
-                placeAdapter.notifyDataSetChanged();
+                Place place = null;
+                try {
+                    place = dataSnapshot.getValue(Place.class);
+                    places.put(place.getPlaceId(), place);
+                    placeAdapter.setPlaces(places);
+                    placeAdapter.notifyDataSetChanged();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -131,9 +138,12 @@ public class PlaceController {
         databaseReference.addChildEventListener(new ChildEventListener() {
 
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
+                System.out.println(dataSnapshot.toString());
                 Place place = dataSnapshot.getValue(Place.class);
                 PlaceController placeController = new PlaceController(place);
-                markers.put(place.getPlaceId(),googleMap.addMarker(placeController.getPlaceMarker()));
+                Marker marker = googleMap.addMarker(placeController.getPlaceMarker());
+                marker.setTag(place.getPlaceId());
+                markers.put(place.getPlaceId(), marker);
             }
 
             @Override
@@ -142,7 +152,9 @@ public class PlaceController {
                 PlaceController placeController = new PlaceController(place);
                 if(markers.containsKey(place.getPlaceId()))
                     markers.get(place.getPlaceId()).remove();
-                markers.put(place.getPlaceId(),googleMap.addMarker(placeController.getPlaceMarker()));
+                Marker marker = googleMap.addMarker(placeController.getPlaceMarker());
+                marker.setTag(place.getPlaceId());
+                markers.put(place.getPlaceId(), marker);
             }
 
             @Override
@@ -170,6 +182,42 @@ public class PlaceController {
         DatabaseReference placeRef = databaseReference.child(place.getPlaceId());
         placeRef.setValue(place);
     }
+
+    public static void getPlace(String placeId, final PlaceInfoFragment placeInfoFragment) {
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference databaseReference = database.getReference("places");
+        Query query = databaseReference.orderByChild("placeId").startAt(placeId).endAt(placeId);
+        ChildEventListener childEventListener = query.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Place place = dataSnapshot.getValue(Place.class);
+                placeInfoFragment.setPlace(place);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
 
     public MarkerOptions getPlaceMarker(){
         MarkerOptions markerOptions = new MarkerOptions();
@@ -204,7 +252,6 @@ public class PlaceController {
         LocalTime currentTime = LocalTime.now();
         LocalDate currentDate = LocalDate.now();
         OpeningHours today = place.getOpeningHours().get(currentDate.getDayOfWeek().getValue()-1);
-        System.out.println("Opening: "+today.getOpening()+"  Closing:"+today.getClosing());
         if(today.getOpening().equals(today.getClosing())) {
             return true;
         }
@@ -212,16 +259,10 @@ public class PlaceController {
             return false;
         }
         else if(LocalTime.parse(today.getOpening()).isAfter(LocalTime.parse(today.getClosing()))){
-            if(currentTime.isAfter(LocalTime.parse(today.getClosing())) && currentTime.isBefore(LocalTime.parse(today.getOpening()))) {
-                return false;
-            }
-            else
-                return true;
+            return !currentTime.isAfter(LocalTime.parse(today.getClosing())) || !currentTime.isBefore(LocalTime.parse(today.getOpening()));
         }
         else
-        if(currentTime.isAfter(LocalTime.parse(today.getOpening())) && currentTime.isBefore(LocalTime.parse(today.getClosing())))
-            return true;
-        return false;
+            return currentTime.isAfter(LocalTime.parse(today.getOpening())) && currentTime.isBefore(LocalTime.parse(today.getClosing()));
     }
 
 }

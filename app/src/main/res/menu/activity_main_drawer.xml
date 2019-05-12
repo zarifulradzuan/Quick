@@ -7,32 +7,15 @@
         <item
             android:id="@+id/nav_browse"
             android:icon="@android:drawable/ic_menu_sort_by_size"
-            android:title="Browse" />
+            android:title="@string/nav_browse" />
         <item
             android:id="@+id/nav_map"
             android:icon="@android:drawable/ic_menu_mapmode"
-            android:title="Map" />
+            android:title="@string/nav_map" />
         <item
             android:id="@+id/nav_tracking"
             android:icon="@android:drawable/ic_menu_myplaces"
-            android:title="Favourite" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="@string/nav_tracking" />
     </group>
-
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
-        </menu>
-    </item>
 
 </menu>

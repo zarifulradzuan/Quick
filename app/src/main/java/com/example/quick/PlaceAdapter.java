@@ -1,7 +1,6 @@
 package com.example.quick;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -13,19 +12,20 @@ import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Set;
-
 import com.example.quick.controller.PlaceController;
 import com.example.quick.controller.TrackingController;
 import com.example.quick.model.Place;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder>{
     private ArrayList<Place> places;
     private Context context;
-    TrackingController trackingController;
+    private TrackingController trackingController;
+
+    public PlaceAdapter() {
+    }
     public PlaceAdapter(Context context){
         places = new ArrayList<>();
         trackingController = new TrackingController(context);
@@ -41,6 +41,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder>{
         return new ViewHolder(itemView);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Place place = places.get(position);
@@ -52,21 +53,20 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder>{
             holder.occupancyBar.setProgressTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.occupancyYellow)));
         else
             holder.occupancyBar.setProgressTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.occupancyRed)));
-        holder.lastUpdated.setText("Last updated: "+place.getLastUpdated());
+        String lastUpdatedText = context.getString(R.string.last_updated);
+        holder.lastUpdated.setText(lastUpdatedText + place.getLastUpdated());
         holder.placeName.setText(place.getPlaceName());
         if(placeController.isOpen()){
-            holder.openingStatus.setText("Open");
+            holder.openingStatus.setText(R.string.open_text);
             holder.openingStatus.setTextColor(Color.GREEN);
-        }
-        else {
-            holder.openingStatus.setText("Closed");
+        } else {
+            holder.openingStatus.setText(R.string.closed_text);
             holder.openingStatus.setTextColor(Color.RED);
         }
 
         if(trackingController.fnGetTracking().contains(place.getPlaceId())){
             holder.trackingSwitch.setChecked(true);
-        }
-        else
+        } else
             holder.trackingSwitch.setChecked(false);
         holder.trackingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -90,10 +90,10 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder>{
         public Switch trackingSwitch;
         public ViewHolder(View itemView) {
             super(itemView);
-            placeName = (TextView) itemView.findViewById(R.id.placeName);
-            openingStatus = (TextView) itemView.findViewById(R.id.openingStatus);
-            lastUpdated = (TextView) itemView.findViewById(R.id.lastUpdated);
-            occupancyBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
+            placeName = itemView.findViewById(R.id.placeName);
+            openingStatus = itemView.findViewById(R.id.openingStatus);
+            lastUpdated = itemView.findViewById(R.id.lastUpdated);
+            occupancyBar = itemView.findViewById(R.id.progressBar);
             trackingSwitch = itemView.findViewById(R.id.trackSwitch);
         }
     }
