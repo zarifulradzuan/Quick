@@ -63,7 +63,6 @@ public class MapViewFragment extends Fragment implements LocationListener {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
                         String placeId = (String) marker.getTag();
-
                         getActivity().findViewById(R.id.placeInfoFrame).setVisibility(View.VISIBLE);
                         FragmentManager fragmentManager = getFragmentManager();
                         Fragment fragment = new PlaceInfoFragment();
