@@ -8,4 +8,8 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="msg_subscribed">Tracked successfully</string>
+    <string name="msg_subscribe_failed">Failed to track place</string>
+    <string name="msg_unsubscribed">Removed tracking successfully</string>
+    <string name="msg_unsubscribe_failed">Failed to remove tracking</string>
 </resources>

@@ -9,23 +9,32 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.quick.controller.PlaceController;
+import com.example.quick.controller.TrackingController;
+import com.example.quick.model.OpeningHours;
+import com.example.quick.model.Place;
 
+import java.util.ArrayList;
 
-public class BrowseActivityFragment extends Fragment {
+public class TrackingActivityFragment extends Fragment {
 
 
     RecyclerView placeRecycler;
     PlaceAdapter placeAdapter;
+    TrackingController trackingController;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.activity_browse_fragment, container, false);
         placeRecycler = rootView.findViewById(R.id.placeRecycler);
 
+        trackingController = new TrackingController(getContext());
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+
         placeAdapter = new PlaceAdapter(getContext());
-        PlaceController.getPlaces(placeAdapter);
+        PlaceController.getPlaces(placeAdapter, trackingController.fnGetTracking(), getContext());
         placeRecycler.setLayoutManager(layoutManager);
         placeRecycler.setAdapter(placeAdapter);
+
+        placeAdapter.notifyDataSetChanged();
         return rootView;
     }
 }
