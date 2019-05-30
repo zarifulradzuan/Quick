@@ -1,11 +1,6 @@
 package com.example.quick.model;
 
 
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,14 +9,16 @@ public class Place {
     private String placeId, placeName, idOwner, lastUpdated, address;
     private double placeLatitude,placeLongitude;
     private List<OpeningHours> openingHours;
-    private int currentOccupancy, maxOccupancy;
+    private int currentOccupancy, maxOccupancy, overrideStatus;
 
     public  Place(){
         openingHours = new ArrayList<OpeningHours>();
     }
-    public Place(String placeId,String placeName, String idOwner, double placeLatitude, double placeLongitude, String address, int maxOccupancy){
+
+    public Place(String placeId, String placeName, String idOwner, double placeLatitude, double placeLongitude, String address, int maxOccupancy, int overrideStatus) {
         openingHours = new ArrayList<OpeningHours>();
         this.placeId = placeId;
+        this.overrideStatus = overrideStatus;
         this.placeName = placeName;
         this.idOwner = idOwner;
         this.placeLatitude = placeLatitude;
@@ -44,6 +41,14 @@ public class Place {
 
     public void setPlaceId(String placeId) {
         this.placeId = placeId;
+    }
+
+    public int getOverrideStatus() {
+        return overrideStatus;
+    }
+
+    public void setOverrideStatus(int overrideStatus) {
+        this.overrideStatus = overrideStatus;
     }
 
     public void setPlaceName(String placeName) {

@@ -14,18 +14,19 @@ import com.example.quick.controller.PlaceController;
 public class BrowseActivityFragment extends Fragment {
 
 
-    RecyclerView placeRecycler;
-    PlaceAdapter placeAdapter;
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.activity_browse_fragment, container, false);
-        placeRecycler = rootView.findViewById(R.id.placeRecycler);
+  RecyclerView placeRecycler;
+  PlaceAdapter placeAdapter;
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        placeAdapter = new PlaceAdapter(getContext());
-        PlaceController.getPlaces(placeAdapter);
-        placeRecycler.setLayoutManager(layoutManager);
-        placeRecycler.setAdapter(placeAdapter);
-        return rootView;
-    }
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    View rootView = inflater.inflate(R.layout.activity_browse_fragment, container, false);
+    placeRecycler = rootView.findViewById(R.id.placeRecycler);
+
+    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+    placeAdapter = new PlaceAdapter(getContext());
+    PlaceController.getPlaces(placeAdapter);
+    placeRecycler.setLayoutManager(layoutManager);
+    placeRecycler.setAdapter(placeAdapter);
+    return rootView;
+  }
 }

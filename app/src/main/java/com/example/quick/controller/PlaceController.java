@@ -246,6 +246,12 @@ public class PlaceController {
     }
 
     public boolean isOpen(){
+        final int OPEN = 1;
+        final int CLOSED = 0;
+        if (place.getOverrideStatus() == OPEN)
+            return true;
+        if (place.getOverrideStatus() == CLOSED)
+            return false;
         if(place.getOpeningHours().isEmpty()){
             return false;
         }
