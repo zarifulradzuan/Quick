@@ -39,6 +39,8 @@ public class PlaceInfoFragment extends Fragment {
         lastUpdated = itemView.findViewById(R.id.lastUpdated);
         occupancyBar = itemView.findViewById(R.id.progressBar);
         trackingSwitch = itemView.findViewById(R.id.trackSwitch);
+        setVisibility(View.INVISIBLE);
+        this.setUserVisibleHint(false);
         return itemView;
     }
 
@@ -79,5 +81,14 @@ public class PlaceInfoFragment extends Fragment {
                     trackingController.fnDeleteSubject(place.getPlaceId());
             }
         });
+        setVisibility(View.VISIBLE);
+    }
+
+    private void setVisibility(int visibility) {
+        this.lastUpdated.setVisibility(visibility);
+        this.occupancyBar.setVisibility(visibility);
+        this.openingStatus.setVisibility(visibility);
+        this.placeName.setVisibility(visibility);
+        this.trackingSwitch.setVisibility(visibility);
     }
 }
