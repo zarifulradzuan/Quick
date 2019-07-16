@@ -22,7 +22,6 @@
         android:id="@+id/placeInfoFrame"
         android:layout_width="0dp"
         android:layout_height="155dp"
-
         android:layout_marginTop="524dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
