@@ -90,6 +90,13 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder>{
         public Switch trackingSwitch;
         public ViewHolder(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //TODO
+                    //Reference to place activity here
+                }
+            });
             placeName = itemView.findViewById(R.id.placeName);
             openingStatus = itemView.findViewById(R.id.openingStatus);
             lastUpdated = itemView.findViewById(R.id.lastUpdated);

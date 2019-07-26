@@ -28,12 +28,11 @@ public class PlaceInfoFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         String placeId = getArguments().getString("placeId");
-        PlaceController.getPlace(placeId, this);
         final View itemView = inflater.inflate(R.layout.place_card, container, false);
+        PlaceController.getPlace(placeId, this);
         placeName = itemView.findViewById(R.id.placeName);
         openingStatus = itemView.findViewById(R.id.openingStatus);
         lastUpdated = itemView.findViewById(R.id.lastUpdated);
@@ -45,6 +44,13 @@ public class PlaceInfoFragment extends Fragment {
     }
 
     public void setPlace(final Place place) {
+        this.getView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO
+                //Add reference to activity here
+            }
+        });
         PlaceController placeController = new PlaceController(place);
         final TrackingController trackingController = new TrackingController(getContext());
         occupancyBar.setProgress(placeController.getFullness());
