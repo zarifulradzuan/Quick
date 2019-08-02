@@ -21,6 +21,7 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -254,6 +255,8 @@ public class PlaceController {
                         } catch (JSONException e) {
                             Log.d("ERROR", "Failed to decode response");
                         }
+                        if (dataSetJSON.length() == 0)
+                            return;
                         if (mode == MODE_WEEKLY) {
                             try {
                                 for (int i = 0; i < 7; i++) {
@@ -293,7 +296,8 @@ public class PlaceController {
                                 e.printStackTrace();
                             }
                         }
-                        ValueFormatter valueFormatter = new ValueFormatter() {
+
+                        ValueFormatter xAxisValueFormatter = new ValueFormatter() {
                             @Override
                             public String getAxisLabel(float value, AxisBase axis) {
                                 Float valueObj = value;
@@ -304,10 +308,16 @@ public class PlaceController {
                                 }
                             }
                         };
+
+
                         BarDataSet barDataSet = new BarDataSet(entries, "Percentage of fullness");
                         BarData barData = new BarData(barDataSet);
+                        trendChart.getAxisLeft().setDrawGridLines(false);
+                        trendChart.getAxisRight().setEnabled(false);
+                        trendChart.getAxisLeft().setValueFormatter(new PercentFormatter());
+                        trendChart.getXAxis().setDrawGridLines(false);
                         trendChart.getXAxis().setGranularity(1f);
-                        trendChart.getXAxis().setValueFormatter(valueFormatter);
+                        trendChart.getXAxis().setValueFormatter(xAxisValueFormatter);
                         trendChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
                         trendChart.setData(barData);
                         if (mode == MODE_DAILY) {

@@ -36,4 +36,8 @@
     <string name="percentagePlaceholder">100%</string>
     <string name="current_occupancy">Current Occupancy:</string>
     <string name="max">Max:</string>
+    <string name="daily">Daily</string>
+    <string name="weekly">Weekly</string>
+    <string name="charts_below_are_made_by_analysing_last_30_days_of_occupancy_data">Charts below are made by analysing last 30 days of occupancy data.</string>
+    <string name="track">Track</string>
 </resources>

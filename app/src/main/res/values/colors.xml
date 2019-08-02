@@ -4,6 +4,6 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D500F9</color>
     <color name="occupancyRed">#D50000</color>
-    <color name="occupancyGreen">#64DD17</color>
+    <color name="occupancyGreen">#449925</color>
     <color name="occupancyYellow">#FFD600</color>
 </resources>

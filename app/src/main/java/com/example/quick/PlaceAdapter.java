@@ -69,7 +69,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder>{
         holder.placeName.setText(place.getPlaceName());
         if(placeController.isOpen()){
             holder.openingStatus.setText(R.string.open_text);
-            holder.openingStatus.setTextColor(Color.GREEN);
+            holder.openingStatus.setTextColor((context.getResources().getColor(R.color.occupancyGreen)));
         } else {
             holder.openingStatus.setText(R.string.closed_text);
             holder.openingStatus.setTextColor(Color.RED);

@@ -71,7 +71,7 @@ public class PlaceInfoFragment extends Fragment implements PlaceController.Place
         placeName.setText(place.getPlaceName());
         if (placeController.isOpen()) {
             openingStatus.setText("Open");
-            openingStatus.setTextColor(Color.GREEN);
+            openingStatus.setTextColor(getActivity().getResources().getColor(R.color.occupancyGreen));
         } else {
             openingStatus.setText("Closed");
             openingStatus.setTextColor(Color.RED);

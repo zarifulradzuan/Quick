@@ -27,6 +27,8 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="24dp"
+                android:layout_marginEnd="175dp"
+                android:layout_toStartOf="@+id/trackSwitch"
                 android:text="name_of_place" />
 
             <TextView
@@ -36,8 +38,7 @@
                 android:layout_below="@+id/placeName"
                 android:layout_alignStart="@+id/placeName"
                 android:layout_marginStart="0dp"
-                android:layout_marginTop="4dp"
-                android:text="open_close" />
+                android:layout_marginTop="4dp" />
 
             <TextView
                 android:id="@+id/lastUpdatedInfo"
@@ -46,8 +47,7 @@
                 android:layout_alignTop="@+id/placeName"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="18dp"
-                android:layout_marginEnd="36dp"
-                android:text="last_updated" />
+                android:layout_marginEnd="36dp" />
 
             <ProgressBar
                 android:id="@+id/occupancyCircular"
@@ -70,8 +70,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentBottom="true"
                 android:layout_marginStart="5dp"
-                android:layout_marginBottom="50dp"
-                android:text="Fullness:" />
+                android:layout_marginBottom="50dp" />
 
             <Switch
                 android:id="@+id/trackSwitch"
@@ -81,7 +80,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="36dp"
-                android:text="Track"
+                android:text="@string/track"
                 android:textColor="@color/cardview_dark_background" />
 
         </RelativeLayout>

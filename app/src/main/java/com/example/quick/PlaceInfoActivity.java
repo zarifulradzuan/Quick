@@ -5,13 +5,21 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.quick.controller.PlaceController;
 import com.example.quick.model.Place;
+import com.github.mikephil.charting.charts.BarChart;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
@@ -26,15 +34,39 @@ public class PlaceInfoActivity extends AppCompatActivity implements PlaceControl
     TextView percentageOccupancy;
     TextView openStatus;
     ProgressBar occupancyCircular;
+    BarChart trendChartDaily;
+    BarChart trendChartWeekly;
     LatLng premiseLocation;
-    private ProgressBar progressBar;
-
+    GoogleMap googleMap;
+    MapView mapView;
+    ProgressBar progressBar;
+    CardView mapCard;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_info);
 
         progressBar = findViewById(R.id.progressBarInfo);
+        trendChartDaily = findViewById(R.id.trendChartDaily);
+        trendChartWeekly = findViewById(R.id.trendChartWeekly);
+        mapCard = findViewById(R.id.mapCardInfo);
+        mapView = findViewById(R.id.mapViewInfo);
+        mapView.onCreate(savedInstanceState);
+        mapView.onResume();
+
+        MapsInitializer.initialize(getApplicationContext());
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap map) {
+                googleMap = map;
+                try {
+                    googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+                    googleMap.getUiSettings().setAllGesturesEnabled(false);
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         openingHoursTextView = new ArrayList<>();
         openingHoursTextView.add((TextView) findViewById(R.id.openingHour0));
@@ -151,7 +183,7 @@ public class PlaceInfoActivity extends AppCompatActivity implements PlaceControl
                 });
 
 
-                final PlaceController placeController = new PlaceController(place);
+                final PlaceController placeController = new PlaceController(place, getApplicationContext());
                 if (placeController.isOpen()) {
                     openStatus.post(new Runnable() {
                         @Override
@@ -194,14 +226,26 @@ public class PlaceInfoActivity extends AppCompatActivity implements PlaceControl
                     occupancyCircular.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.occupancyYellow)));
                 else
                     occupancyCircular.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.occupancyRed)));
+
+                placeController.getTrendData(place.getPlaceId(), PlaceController.MODE_DAILY, trendChartDaily);
+                placeController.getTrendData(place.getPlaceId(), PlaceController.MODE_WEEKLY, trendChartWeekly);
+
+
                 progressBar.post(new Runnable() {
                     @Override
                     public void run() {
                         progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
+
+
             }
         };
+        googleMap.addMarker(new MarkerOptions()
+                .title(place.getPlaceName())
+                .position(new LatLng(place.getPlaceLatitude(), place.getPlaceLongitude())));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(place.getPlaceLatitude(), place.getPlaceLongitude()), 15));
+
         applyPlaceThread.start();
     }
 }
