@@ -27,7 +27,7 @@ public class TrackingActivityFragment extends Fragment {
     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
 
     placeAdapter = new PlaceAdapter(getContext());
-    PlaceController.getPlaces(placeAdapter, trackingController.fnGetTracking(), getContext());
+    PlaceController.getPlaces(placeAdapter, trackingController.fnGetTracking());
     placeRecycler.setLayoutManager(layoutManager);
     placeRecycler.setAdapter(placeAdapter);
 

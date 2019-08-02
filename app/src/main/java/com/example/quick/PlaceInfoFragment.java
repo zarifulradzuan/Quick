@@ -1,9 +1,11 @@
 package com.example.quick;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,12 +19,12 @@ import com.example.quick.controller.TrackingController;
 import com.example.quick.model.Place;
 
 
-public class PlaceInfoFragment extends Fragment {
+public class PlaceInfoFragment extends Fragment implements PlaceController.PlaceListener {
     private TextView placeName, openingStatus, lastUpdated;
     private ProgressBar occupancyBar;
     private Switch trackingSwitch;
-
-
+    private Place place;
+    private CardView cardView;
     public PlaceInfoFragment() {
         // Required empty public constructor
     }
@@ -33,22 +35,27 @@ public class PlaceInfoFragment extends Fragment {
         String placeId = getArguments().getString("placeId");
         final View itemView = inflater.inflate(R.layout.place_card, container, false);
         PlaceController.getPlace(placeId, this);
+        cardView = itemView.findViewById(R.id.placeCard);
         placeName = itemView.findViewById(R.id.placeName);
         openingStatus = itemView.findViewById(R.id.openingStatus);
-        lastUpdated = itemView.findViewById(R.id.lastUpdated);
-        occupancyBar = itemView.findViewById(R.id.progressBar);
+        lastUpdated = itemView.findViewById(R.id.lastUpdatedInfo);
+        occupancyBar = itemView.findViewById(R.id.occupancyCircular);
         trackingSwitch = itemView.findViewById(R.id.trackSwitch);
-        setVisibility(View.INVISIBLE);
-        this.setUserVisibleHint(false);
+        itemView.setVisibility(View.INVISIBLE);
         return itemView;
     }
 
-    public void setPlace(final Place place) {
-        this.getView().setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void applyPlace(final Place place) {
+        this.place = place;
+        cardView.setClickable(true);
+        cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO
-                //Add reference to activity here
+                System.out.println("Clicked");
+                Intent intent = new Intent(getContext(), PlaceInfoActivity.class);
+                intent.putExtra("placeId", place.getPlaceId());
+                startActivity(intent);
             }
         });
         PlaceController placeController = new PlaceController(place);
@@ -60,7 +67,7 @@ public class PlaceInfoFragment extends Fragment {
             occupancyBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.occupancyYellow)));
         else
             occupancyBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.occupancyRed)));
-        lastUpdated.setText("Last updated: " + place.getLastUpdated());
+        lastUpdated.setText(String.format("%s %s", getString(R.string.last_updated), place.getLastUpdated()));
         placeName.setText(place.getPlaceName());
         if (placeController.isOpen()) {
             openingStatus.setText("Open");
@@ -87,14 +94,6 @@ public class PlaceInfoFragment extends Fragment {
                     trackingController.fnDeleteSubject(place.getPlaceId());
             }
         });
-        setVisibility(View.VISIBLE);
-    }
-
-    private void setVisibility(int visibility) {
-        this.lastUpdated.setVisibility(visibility);
-        this.occupancyBar.setVisibility(visibility);
-        this.openingStatus.setVisibility(visibility);
-        this.placeName.setVisibility(visibility);
-        this.trackingSwitch.setVisibility(visibility);
+        this.getView().setVisibility(View.VISIBLE);
     }
 }

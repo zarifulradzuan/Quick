@@ -3,11 +3,25 @@ package com.example.quick.controller;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.quick.PlaceAdapter;
-import com.example.quick.PlaceInfoFragment;
+import com.example.quick.R;
 import com.example.quick.model.OpeningHours;
 import com.example.quick.model.Place;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -20,19 +34,31 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PlaceController {
     private Place place;
-    private FirebaseDatabase database;
-    private DatabaseReference databaseReference;
+    public static final int MODE_WEEKLY = 1;
+    public static final int MODE_DAILY = 2;
+    private static final String[] daysList = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+    private Context context;
+
     public PlaceController(Place place) {
         this.place = place;
-        database = FirebaseDatabase.getInstance();
-        databaseReference = database.getReference("places");
+    }
+
+    public PlaceController(Place place, Context context) {
+        this.context = context;
+        this.place = place;
     }
 
     public static void getPlaces(final PlaceAdapter placeAdapter){
@@ -85,7 +111,7 @@ public class PlaceController {
         });
     }
 
-    public static void getPlaces(final PlaceAdapter placeAdapter, final List<String> tracking, final Context context){
+    public static void getPlaces(final PlaceAdapter placeAdapter, final List<String> tracking) {
         final HashMap<String, Place> places = new HashMap<>();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference databaseReference = database.getReference("places");
@@ -176,23 +202,16 @@ public class PlaceController {
         });
     }
 
-    public static void insertPlace(Place place){
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference = database.getReference("places");
-        DatabaseReference placeRef = databaseReference.child(place.getPlaceId());
-        placeRef.setValue(place);
-    }
-
-    public static void getPlace(String placeId, final PlaceInfoFragment placeInfoFragment) {
+    public static void getPlace(String placeId, final PlaceListener placeListener) {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference databaseReference = database.getReference("places");
         Query query = databaseReference.orderByChild("placeId").startAt(placeId).endAt(placeId);
-        ChildEventListener childEventListener = query.addChildEventListener(new ChildEventListener() {
+        query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Place place = dataSnapshot.getValue(Place.class);
-                placeInfoFragment.setPlace(place);
+                placeListener.applyPlace(place);
             }
 
             @Override
@@ -215,6 +234,107 @@ public class PlaceController {
 
             }
         });
+
+    }
+
+    public void getTrendData(final String placeId, final int mode, final BarChart trendChart) {
+        final List<BarEntry> entries = new ArrayList<>();
+        Thread getTrend = new Thread() {
+            @Override
+            public void run() {
+                RequestQueue requestQueue = Volley.newRequestQueue(context);
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, context.getString(R.string.hostUrl), new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        JSONArray dataSetJSON = null;
+
+                        final ArrayList<String> labels = new ArrayList<>();
+                        try {
+                            dataSetJSON = new JSONArray(response);
+                        } catch (JSONException e) {
+                            Log.d("ERROR", "Failed to decode response");
+                        }
+                        if (mode == MODE_WEEKLY) {
+                            try {
+                                for (int i = 0; i < 7; i++) {
+                                    labels.add(daysList[i]);
+                                    for (int j = 0; j < (dataSetJSON != null ? dataSetJSON.length() : 0); j++) {
+                                        JSONObject currentObj = dataSetJSON.getJSONObject(j);
+                                        if (currentObj.getString("Day").equals(daysList[i])) {
+                                            entries.add(new BarEntry(i, currentObj.getInt("Average")));
+                                            break;
+                                        }
+                                        if (j == dataSetJSON.length() - 1)
+                                            entries.add(new BarEntry(i, 0));
+
+                                    }
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try {
+                                for (int i = 0; i < 24; i++) {
+                                    labels.add(i + ":00");
+                                    for (int j = 0; j < (dataSetJSON != null ? dataSetJSON.length() : 0); j++) {
+                                        JSONObject currentObj = dataSetJSON.getJSONObject(j);
+                                        if (currentObj.getInt("Hour") == i) {
+                                            entries.add(new BarEntry(i, currentObj.getInt("Average")));
+                                            break;
+                                        }
+                                        if (j == dataSetJSON.length() - 1)
+                                            entries.add(new BarEntry(i, 0));
+
+                                    }
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        ValueFormatter valueFormatter = new ValueFormatter() {
+                            @Override
+                            public String getAxisLabel(float value, AxisBase axis) {
+                                Float valueObj = value;
+                                try {
+                                    return labels.get((valueObj.intValue()));
+                                } catch (IndexOutOfBoundsException e) {
+                                    return "";
+                                }
+                            }
+                        };
+                        BarDataSet barDataSet = new BarDataSet(entries, "Percentage of fullness");
+                        BarData barData = new BarData(barDataSet);
+                        trendChart.getXAxis().setGranularity(1f);
+                        trendChart.getXAxis().setValueFormatter(valueFormatter);
+                        trendChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+                        trendChart.setData(barData);
+                        if (mode == MODE_DAILY) {
+                            trendChart.zoom(3.5f, 1f, 0, 0);
+                        } else
+                            trendChart.zoom(0f, 1f, 0, 0);
+                        trendChart.invalidate();
+                    }
+                },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                error.printStackTrace();
+                            }
+                        }) {
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String> params = new HashMap<>();
+                        params.put("trendPlaceId", placeId);
+                        params.put("mode", String.valueOf(mode));
+                        return params;
+                    }
+                };
+                requestQueue.add(stringRequest);
+            }
+        };
+        getTrend.start();
 
     }
 
@@ -269,6 +389,10 @@ public class PlaceController {
         }
         else
             return currentTime.isAfter(LocalTime.parse(today.getOpening())) && currentTime.isBefore(LocalTime.parse(today.getClosing()));
+    }
+
+    public interface PlaceListener {
+        void applyPlace(Place place);
     }
 
 }

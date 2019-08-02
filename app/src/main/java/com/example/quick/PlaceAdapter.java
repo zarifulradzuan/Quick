@@ -3,6 +3,7 @@ package com.example.quick;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,16 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder>{
     private ArrayList<Place> places;
     private Context context;
     private TrackingController trackingController;
+
+    private ClickListener clickListener;
+
+    public void setOnItemClickListener(ClickListener clickListener) {
+        this.clickListener = clickListener;
+    }
+
+    public interface ClickListener {
+        void onItemClick(Place place, View v);
+    }
 
     public PlaceAdapter() {
     }
@@ -84,24 +95,26 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder>{
         return places.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView placeName, openingStatus, lastUpdated;
+        public CardView cardView;
         public ProgressBar occupancyBar;
         public Switch trackingSwitch;
         public ViewHolder(View itemView) {
             super(itemView);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //TODO
-                    //Reference to place activity here
-                }
-            });
+            cardView = itemView.findViewById(R.id.placeCard);
+            cardView.setOnClickListener(this);
             placeName = itemView.findViewById(R.id.placeName);
             openingStatus = itemView.findViewById(R.id.openingStatus);
-            lastUpdated = itemView.findViewById(R.id.lastUpdated);
-            occupancyBar = itemView.findViewById(R.id.progressBar);
+            lastUpdated = itemView.findViewById(R.id.lastUpdatedInfo);
+            occupancyBar = itemView.findViewById(R.id.occupancyCircular);
             trackingSwitch = itemView.findViewById(R.id.trackSwitch);
+        }
+
+
+        @Override
+        public void onClick(View v) {
+            clickListener.onItemClick(places.get(getAdapterPosition()), v);
         }
     }
 }
