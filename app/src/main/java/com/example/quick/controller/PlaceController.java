@@ -11,8 +11,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.quick.PlaceAdapter;
 import com.example.quick.R;
+import com.example.quick.adapter.PlaceAdapter;
 import com.example.quick.model.OpeningHours;
 import com.example.quick.model.Place;
 import com.github.mikephil.charting.charts.BarChart;
@@ -320,6 +320,7 @@ public class PlaceController {
                         trendChart.getXAxis().setValueFormatter(xAxisValueFormatter);
                         trendChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
                         trendChart.setData(barData);
+                        trendChart.resetZoom();
                         if (mode == MODE_DAILY) {
                             trendChart.zoom(3.5f, 1f, 0, 0);
                         } else

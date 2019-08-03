@@ -423,8 +423,7 @@
                         android:layout_marginStart="24dp"
                         android:layout_marginTop="8dp"
                         android:text="@string/daily"
-                        android:textColor="#000000"
-                        android:textSize="24sp" />
+                        android:textColor="#000000" />
 
                     <com.github.mikephil.charting.charts.BarChart
                         android:id="@+id/trendChartDaily"
@@ -446,8 +445,7 @@
                         android:layout_marginStart="24dp"
                         android:layout_marginTop="8dp"
                         android:text="@string/weekly"
-                        android:textColor="#000000"
-                        android:textSize="24sp" />
+                        android:textColor="#000000" />
 
                     <com.github.mikephil.charting.charts.BarChart
                         android:id="@+id/trendChartWeekly"
@@ -465,6 +463,82 @@
 
                 </LinearLayout>
 
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="24dp"
+                android:elevation="4dp"
+                android:paddingBottom="24dp"
+                card_view:cardCornerRadius="4dp"
+                card_view:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:id="@+id/currentSituationLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginTop="8dp"
+                        android:text="Latest Comment"
+                        android:textColor="#000000" />
+
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <EditText
+                            android:id="@+id/messageCommentInfo"
+                            android:layout_width="279dp"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginEnd="3dp"
+                            android:layout_marginBottom="8dp"
+                            android:ems="10"
+                            android:hint="Anything interesting here?"
+                            android:inputType="textMultiLine|text"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/saveCommentButtonInfo"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <Button
+                            android:id="@+id/saveCommentButtonInfo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Send"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/messageCommentInfo"
+                            app:layout_constraintTop_toTopOf="parent"
+                            card_view:layout_constraintEnd_toEndOf="parent" />
+
+                    </android.support.constraint.ConstraintLayout>
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/commentRecycler"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginBottom="24dp" />
+
+                    <TextView
+                        android:id="@+id/commentPlaceholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginTop="240dp"
+                        android:layout_marginBottom="250dp"
+                        android:text="No comment found"
+                        android:textAlignment="center"
+                        android:textColor="#000000" />
+                </LinearLayout>
             </android.support.v7.widget.CardView>
 
         </LinearLayout>

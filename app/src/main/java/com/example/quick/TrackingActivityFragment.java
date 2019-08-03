@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.quick.adapter.PlaceAdapter;
 import com.example.quick.controller.PlaceController;
 import com.example.quick.controller.TrackingController;
 

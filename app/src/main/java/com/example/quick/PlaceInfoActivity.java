@@ -6,11 +6,18 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.quick.adapter.CommentAdapter;
+import com.example.quick.controller.CommentController;
 import com.example.quick.controller.PlaceController;
+import com.example.quick.model.Comment;
 import com.example.quick.model.Place;
 import com.github.mikephil.charting.charts.BarChart;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,9 +28,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public class PlaceInfoActivity extends AppCompatActivity implements PlaceController.PlaceListener {
+public class PlaceInfoActivity extends AppCompatActivity implements PlaceController.PlaceListener, CommentAdapter.CommentSizeInterface {
     String placeId;
     ArrayList<TextView> openingHoursTextView;
     TextView maxOccupancy;
@@ -41,11 +49,19 @@ public class PlaceInfoActivity extends AppCompatActivity implements PlaceControl
     MapView mapView;
     ProgressBar progressBar;
     CardView mapCard;
+    CommentAdapter commentAdapter;
+    RecyclerView commentRecycler;
+    Button sendComment;
+    EditText messageComment;
+    TextView commentPlaceholder;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_info);
 
+        commentPlaceholder = findViewById(R.id.commentPlaceholder);
+        messageComment = findViewById(R.id.messageCommentInfo);
+        sendComment = findViewById(R.id.saveCommentButtonInfo);
         progressBar = findViewById(R.id.progressBarInfo);
         trendChartDaily = findViewById(R.id.trendChartDaily);
         trendChartWeekly = findViewById(R.id.trendChartWeekly);
@@ -53,6 +69,9 @@ public class PlaceInfoActivity extends AppCompatActivity implements PlaceControl
         mapView = findViewById(R.id.mapViewInfo);
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
+
+        commentRecycler = findViewById(R.id.commentRecycler);
+        commentRecycler.setVisibility(View.GONE);
 
         MapsInitializer.initialize(getApplicationContext());
         mapView.getMapAsync(new OnMapReadyCallback() {
@@ -94,6 +113,21 @@ public class PlaceInfoActivity extends AppCompatActivity implements PlaceControl
         super.onStart();
         Intent intent = getIntent();
         this.placeId = intent.getStringExtra("placeId");
+        commentAdapter = new CommentAdapter(this);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        commentRecycler.setLayoutManager(layoutManager);
+        commentRecycler.setAdapter(commentAdapter);
+        sendComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Comment toInsert = new Comment();
+                toInsert.setDateTime(LocalDateTime.now().toString());
+                toInsert.setMessage(messageComment.getText().toString());
+                toInsert.setPlaceId(placeId);
+                CommentController.insertComment(toInsert);
+                messageComment.setText("");
+            }
+        });
         if (this.placeId != null) {
             progressBar.setVisibility(View.VISIBLE);
 
@@ -104,6 +138,9 @@ public class PlaceInfoActivity extends AppCompatActivity implements PlaceControl
     @SuppressLint("DefaultLocale")
     @Override
     public void applyPlace(final Place place) {
+        CommentController.getComments(commentAdapter, place.getPlaceId());
+
+
         Thread applyPlaceThread = new Thread() {
             @Override
             public void run() {
@@ -247,5 +284,16 @@ public class PlaceInfoActivity extends AppCompatActivity implements PlaceControl
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(place.getPlaceLatitude(), place.getPlaceLongitude()), 15));
 
         applyPlaceThread.start();
+    }
+
+    @Override
+    public void commentSizeListener(int size) {
+        if (size > 0) {
+            commentRecycler.setVisibility(View.VISIBLE);
+            commentPlaceholder.setVisibility(View.GONE);
+        } else {
+            commentRecycler.setVisibility(View.GONE);
+            commentPlaceholder.setVisibility(View.VISIBLE);
+        }
     }
 }

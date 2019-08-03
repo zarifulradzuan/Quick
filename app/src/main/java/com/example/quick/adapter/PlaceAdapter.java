@@ -1,4 +1,4 @@
-package com.example.quick;
+package com.example.quick.adapter;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.example.quick.R;
 import com.example.quick.controller.PlaceController;
 import com.example.quick.controller.TrackingController;
 import com.example.quick.model.Place;
@@ -46,6 +47,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder>{
     public void setPlaces(HashMap<String,Place> places){
         this.places = new ArrayList<>(places.values());
     }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.place_card,parent,false);
