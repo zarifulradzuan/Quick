@@ -120,12 +120,14 @@ public class PlaceInfoActivity extends AppCompatActivity implements PlaceControl
         sendComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Comment toInsert = new Comment();
-                toInsert.setDateTime(LocalDateTime.now().toString());
-                toInsert.setMessage(messageComment.getText().toString());
-                toInsert.setPlaceId(placeId);
-                CommentController.insertComment(toInsert);
-                messageComment.setText("");
+                if (!messageComment.getText().toString().equals("")) {
+                    Comment toInsert = new Comment();
+                    toInsert.setDateTime(LocalDateTime.now().toString());
+                    toInsert.setMessage(messageComment.getText().toString());
+                    toInsert.setPlaceId(placeId);
+                    CommentController.insertComment(toInsert);
+                    messageComment.setText("");
+                }
             }
         });
         if (this.placeId != null) {
